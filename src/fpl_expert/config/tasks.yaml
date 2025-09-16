@@ -1,0 +1,135 @@
+scout_players_task:
+  description: >
+    Scout and analyze players across all positions for the upcoming Champions League gameweek.
+    Research current form, injury status, recent performances, expected playing time, and statistical trends.
+    Focus on players who have performed well in recent games and are likely to start.
+    Consider both premium and budget options across goalkeepers, defenders, midfielders, and forwards.
+    Current season is {current_season}, current date is {current_date}, budget is {budget} million euros, and we're analyzing for {month_year}.
+    Note: Champions League Fantasy uses 36 teams in league phase with 8 gameweeks, max 3 players per club.
+    CRITICAL: Before recommending any player, ALWAYS verify their current team and playing status for the current season.
+    Use the Player Team Verification Tool to confirm current team, transfer status, and Champions League eligibility.
+    Do not recommend players based on outdated team information or past seasons.
+    Use dynamic date context for all analysis to ensure current and relevant information.
+  expected_output: >
+    A comprehensive list of recommended players by position with:
+    - Player name, CURRENT team (verified for current season), position, and price
+    - Recent form analysis (last 3-5 games with current team)
+    - Injury/rotation risk assessment
+    - Key stats and performance indicators
+    - Reasoning for recommendation
+    - VERIFICATION: Each player's current team and Champions League eligibility confirmed
+    - Save the complete analysis to a file named "player_analysis_{current_date}.md"
+  agent: player_scout
+
+analyze_tactics_task:
+  description: >
+    Analyze team tactical setups, formations, and playing styles for the upcoming Champions League fixtures.
+    Identify which tactical matchups favor attacking returns, which teams play high lines vulnerable to pace,
+    and which formations create the most scoring opportunities for specific player types.
+    Consider how teams adapt tactically in European competition vs domestic leagues.
+    Current season is {current_season} and current date is {current_date}.
+    Ensure all tactical analysis uses current date context for accuracy.
+  expected_output: >
+    Tactical analysis report covering:
+    - Team formation and style analysis
+    - Tactical matchup assessments
+    - Players most likely to benefit from tactical setups
+    - Expected goal involvement based on tactical roles
+    - Set-piece specialists and penalty takers identification
+    - Save the complete tactical analysis to a file named "tactical_analysis_{current_date}.md"
+  agent: tactical_analyst
+
+analyze_fixtures_task:
+  description: >
+    Evaluate all Champions League fixtures for difficulty, rotation risks, and schedule impact.
+    Consider team prioritization of Champions League vs domestic competitions, typical rotation patterns,
+    and which players are most likely to be rested or rotated. Current gameweek is {matchweek}.
+    Analyze both immediate fixtures and upcoming schedule congestion for {current_season} season.
+    Note: Champions League gameweeks cover all matches on specific matchdays (Tuesday/Wednesday).
+    Today's date is {current_date}. Use dynamic date context for accurate fixture analysis.
+  expected_output: >
+    Fixture analysis containing:
+    - Fixture difficulty ratings for each team
+    - Rotation risk assessment by team and player
+    - Schedule congestion impact analysis
+    - Best and worst fixtures to target
+    - Players least likely to be rotated
+    - Save the complete fixture analysis to a file named "fixture_analysis_{current_date}.md"
+  agent: fixture_expert
+
+select_captain_task:
+  description: >
+    Based on all previous analysis, identify the optimal captain choice for maximum points potential.
+    Consider form, fixtures, tactical setup, set-piece duties, penalty responsibilities, and ceiling potential.
+    Provide both a primary captain recommendation and differential captain options for rank climbing.
+    Current analysis date is {current_date} for {current_season} season.
+    Base all recommendations on current date context for maximum relevance.
+  expected_output: >
+    Captain selection analysis with:
+    - Primary captain recommendation with detailed justification
+    - Alternative captain options with pros/cons
+    - Differential captain picks for rank climbing
+    - Historical performance in similar fixtures
+    - Risk assessment for each captain option
+    - Save the complete captain analysis to a file named "captain_analysis_{current_date}.md"
+  agent: captain_selector
+  context: [scout_players_task, analyze_tactics_task, analyze_fixtures_task]
+
+optimize_budget_task:
+  description: >
+    Analyze the budget allocation strategy and identify the best value players across all price ranges.
+    Ensure optimal budget distribution between premium assets and budget enablers.
+    Budget limit is {budget} million for 15 players with specific formation requirements.
+    Consider current market conditions and price trends as of {current_date}.
+  expected_output: >
+    Budget optimization report including:
+    - Recommended budget allocation by position
+    - Best value players in each price bracket
+    - Premium vs budget player balance
+    - Funds remaining for future transfers
+    - Value picks likely to rise in price
+    - Save the complete budget analysis to a file named "budget_analysis_{current_date}.md"
+  agent: budget_optimizer
+  context: [scout_players_task, analyze_fixtures_task]
+
+gather_community_insights_task:
+  description: >
+    Research current community sentiment, expert predictions, and top manager strategies.
+    Analyze social media trends, popular picks, and identify potential differential opportunities.
+    Look for insights from seasoned Champions League fantasy players and expert analysts.
+    Focus on the most recent community activity and trends as of {current_date}.
+  expected_output: >
+    Community intelligence report with:
+    - Popular player picks and ownership percentages
+    - Expert recommendations and predictions
+    - Emerging differential opportunities
+    - Community sentiment analysis
+    - Contrarian picks for rank advancement
+    - Save the complete community analysis to a file named "community_analysis_{current_date}.md"
+  agent: community_analyst
+
+build_optimal_team_task:
+  description: >
+    Synthesize all analysis to construct the optimal 15-player Champions League fantasy squad.
+    Ensure proper formation flexibility, bench strategy, and balance between consistency and upside.
+    Consider captain selection, transfer strategy, and long-term team building approach.
+    Formation requirements: 2 GK, 5 DEF, 5 MID, 3 FWD within {budget} million euros budget.
+    Champions League Fantasy rules: Max 3 players per club, 36 teams in league phase, 8 gameweeks.
+    CRITICAL: Before finalizing any player selection, verify their current team and Champions League eligibility for the current season.
+    Use the Player Team Verification Tool to confirm all players are currently at Champions League clubs and eligible to play.
+    Do not include players who have transferred to non-Champions League teams or are not currently playing.
+    Ensure all selections are based on current date context ({current_date}) for maximum relevance.
+  expected_output: >
+    Complete team selection including:
+    - Final 15-player squad with positions and prices (ALL PLAYERS VERIFIED FOR CURRENT TEAMS)
+    - Starting XI formation and bench players
+    - Captain and vice-captain selections
+    - Transfer strategy for upcoming weeks
+    - Team total cost and remaining budget
+    - Risk assessment and differential analysis
+    - Justification for each player selection
+    - VERIFICATION CONFIRMATION: All players confirmed to be at Champions League clubs for the current season
+    - Save the complete team selection to a file named "champions_league_team_{current_date}.md"
+    - Create a summary file named "team_summary_{current_date}.txt" with just the 15 players and formation
+  agent: team_builder
+  context: [scout_players_task, analyze_tactics_task, analyze_fixtures_task, select_captain_task, optimize_budget_task, gather_community_insights_task]
